@@ -26,10 +26,16 @@ class ChatScreen extends StatefulWidget{
 
 class ChatScreenState extends State<ChatScreen>{
   final TextEditingController _textController = new TextEditingController(); 
+  final List<MessageWidget> _messages = <MessageWidget>[]; 
 
   void _handleSubmitted(String text) {
-    print(text);
     _textController.clear();
+    MessageWidget message = new MessageWidget(                         //new
+      text: text,                                                  //new
+    );                                                             //new
+    setState(() {                                                  //new
+      _messages.insert(0, message);                                //new
+    }); 
   }
 
   @override
@@ -38,9 +44,28 @@ class ChatScreenState extends State<ChatScreen>{
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: _buildTextComposer(
-        textController: _textController,
-        handleSubmitted: (context) => _handleSubmitted(_textController.text ?? "")
+      body: Container(
+        child: Column(
+          children: <Widget>[
+            Flexible(
+              child: new ListView.builder(                            //new 
+                padding: new EdgeInsets.all(8.0),                     //new
+                reverse: true,                                        //new
+                itemBuilder: (_, int index) => _messages[index],      //new
+                itemCount: _messages.length,                          //new
+              ),   
+            ),
+            Divider(height: 1.0),  
+            Container(
+              decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor),
+              child:  _buildTextComposer(
+                        textController: _textController,
+                        handleSubmitted: (context) => _handleSubmitted(_textController.text ?? "")
+                      ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -74,4 +99,37 @@ Widget _buildTextComposer({TextEditingController textController, Function handle
       )
     )
   );
+}
+
+class MessageWidget extends StatelessWidget{
+  final String text;
+  MessageWidget({this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(right: 16.0),
+            child: CircleAvatar(
+              child: Text("Wahyu Permadi"),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              new Text("Wahyu Permadi", style: Theme.of(context).textTheme.subhead),
+              new Container(
+                margin: const EdgeInsets.only(top: 5.0),
+                child: new Text(text),
+              ),
+            ]
+          )
+        ],
+      ),
+    );
+  }
 }
